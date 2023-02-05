@@ -1,34 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { useState } from "react"
 
-function App() {
-  const [count, setCount] = useState(0)
+const TURNOS = {
+  X: "x",
+  O: "o"
+}
 
+const Square = ({ children, isSelected, updateBoard, index})=>{
+  const className = `square ${isSelected ? "is-selected": ""}`
+
+  const handleClick = () => {
+    updateBoard()
+  }
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          prueba para gits{count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div onClick={handleClick} className={className}>
+      {children}
     </div>
   )
+}
+
+function App() {
+
+  const [board, setboard] = useState(Array(9).fill(null))
+
+  const [turn, setTurn] = useState(TURNOS.X)
+
+  const updateBoard = () => {
+    const newTurn = turn === TURNOS.X ? TURNOS.O : TURNOS.X
+  }
+
+  return(
+    <main className="board">
+      <h1>Tic tac toe</h1>
+      <section className="game">
+        {
+          board.map((_, index) => {
+            return(
+              <Square key={index} index={index} updateBoard={updateBoard}>
+                {board[index]}
+              </Square>
+            )
+          })
+        }
+      </section>
+      <section className="turn">
+        <Square isSelected={turn === TURNOS.X}>
+          {TURNOS.X}
+        </Square>
+        <Square isSelected={turn === TURNOS.O}>
+        {TURNOS.O}
+        </Square>
+
+      </section>
+    </main>
+
+  ) 
+
 }
 
 export default App
