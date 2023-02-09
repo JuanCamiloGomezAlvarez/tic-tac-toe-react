@@ -1,33 +1,9 @@
 import { useState } from "react"
+import confetti from "canvas-confetti"
 
-const TURNOS = {
-  X: "x",
-  O: "o"
-}
+import { Square } from "./components/Square.jsx"
+import { TURNOS, WINER_COMBOS } from "./constants.js"
 
-const Square = ({ children, isSelected, updateBoard, index})=>{
-  const className = `square ${isSelected ? "is-selected": ""}`
-
-  const handleClick = () => {
-    updateBoard(index)
-  }
-  return (
-    <div onClick={handleClick} className={className}>
-      {children}
-    </div>
-  )
-}
-
-const WINER_COMBOS = [
-  [0,1,2],
-  [3,4,5],
-  [6,7,8],
-  [0,3,6],
-  [1,4,7],
-  [2,5,8],
-  [0,4,8],
-  [2,4,6]
-]
 function App() {
 
   const [board, setBoard] = useState(Array(9).fill(null))
@@ -50,9 +26,19 @@ function App() {
     return null
   }
 
+  const resetGame = () => {
+    setBoard(Array(9).fill(null))
+    setTurn(TURNOS.X)
+    setWinner(null)
+  }
+
+  const checkEndGame = (newBoard) => {
+    return newBoard.every((square) => square !== null)
+  }
+
   const updateBoard = (index) => {
     // esta linea sirve para impedir que se sobre escriba el board seleccionado
-    if(board[index] || winner)return
+    if(board[index] || winner) return
     // Actualizar el tablero
     const newBoard = [...board]
     newBoard[index] = turn
@@ -63,12 +49,16 @@ function App() {
 
     const newWinner = checkWinner(newBoard)
     if(newWinner){
+      confetti()
       setWinner(newWinner)
+    }else if(checkEndGame(newBoard)){
+      setWinner(false)
     }
   }
 
   return(
     <main className="board">
+      <button onClick={resetGame}>Reiniciar</button>
       <h1>Tic tac toe</h1>
       <section className="game">
         {
@@ -88,8 +78,28 @@ function App() {
         <Square isSelected={turn === TURNOS.O}>
         {TURNOS.O}
         </Square>
-
       </section>
+      {
+        winner !== null && (
+          <section className="winner">
+            <div className="text">
+              <h2>
+                {
+                  winner === false
+                  ? "Empate"
+                  : "Ganó: " 
+                }
+              </h2>  
+              <header className="win">
+                {winner && <Square>{winner}</Square>}
+              </header>
+              <footer>
+                <button onClick={resetGame}>Empezar de nuevo</button>
+              </footer>
+            </div>
+          </section>
+        )
+      }
     </main>
 
   ) 
