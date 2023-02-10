@@ -6,9 +6,16 @@ import { TURNOS, WINER_COMBOS } from "./constants.js"
 
 function App() {
 
-  const [board, setBoard] = useState(Array(9).fill(null))
+  const [board, setBoard] = useState( () => {
+      const boardFromStorage = window.localStorage.getItem("board")
+      if(boardFromStorage) return JSON.parse(boardFromStorage)
+      return Array(9).fill(null)
+    })
 
-  const [turn, setTurn] = useState(TURNOS.X)
+  const [turn, setTurn] = useState( () => {
+      const turnFromStorage = window.localStorage.getItem("turn")
+      return turnFromStorage ?? TURNOS.X
+    })
 
   const [winner, setWinner] = useState(null) 
 
@@ -30,6 +37,9 @@ function App() {
     setBoard(Array(9).fill(null))
     setTurn(TURNOS.X)
     setWinner(null)
+
+    window.localStorage.removeItem("board")
+    window.localStorage.removeItem("turn")
   }
 
   const checkEndGame = (newBoard) => {
@@ -46,6 +56,9 @@ function App() {
     //cambiar el turno
     const newTurn = turn === TURNOS.X ? TURNOS.O : TURNOS.X
     setTurn(newTurn)
+
+    window.localStorage.setItem("board", JSON.stringify(newBoard))
+    window.localStorage.setItem("turn", newTurn)
 
     const newWinner = checkWinner(newBoard)
     if(newWinner){
